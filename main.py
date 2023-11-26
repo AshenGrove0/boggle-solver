@@ -142,6 +142,8 @@ def find_all_letter_combos(board):
 
     #Make sure it cannot go back on itself as it is not allowed
     # And also would lead to an infinite loop
+    # I could do the network thing but i think it would be 
+    # safer to not do that and just do the square
     return NotImplementedError
 
 
