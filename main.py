@@ -1,5 +1,7 @@
 # main.py
 import string
+import copy
+
 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -15,6 +17,8 @@ WWWW/XX2XX/Y2YYY/ZZZZ
 
 
 '''
+
+# Make tests?
 
 
 #use my own sorting algoirhm for practice?
@@ -80,19 +84,31 @@ def get_diamensions(parsed_board):
 def find_double_coords(parsed_board, diamensions):
     
     double_coords = []
+    rows = diamensions[0]
+    letters_per_row = diamensions[1]
+    parsed_board_no_doubles = copy.deepcopy(parsed_board)
 
-    for line in range(len(parsed_board)):
-        if len(parsed_board[line]) != diamensions[1]: # Number of letters in a line
-            for character in range(len(parsed_board[line])):
-                if parsed_board[line][character] not in LETTERS_LIST:
-                    if parsed_board[line][character] == 2 or parsed_board[line][character] == "2":
-                        double_coords.append(tuple((line, character))) # Adds it to the list
-                        parsed_board[line].remove(parsed_board[line][character]) # Formats the parsed list to get rid of it
+    for row in range(rows):
+        current_row = parsed_board[row]
+        current_row_length = len(current_row)
+        if current_row_length != letters_per_row: # Number of letters in a line
+            
+
+            for character_index in range(current_row_length):
+                character = parsed_board[row][character_index]
+                print(character_index, character)
+
+                if character not in LETTERS_LIST:
+
+                    if character == 2 or character == "2":
+                        double_coords.append(tuple((row, character_index))) # Adds it to the list
+                        parsed_board_no_doubles[row].remove(character) # Formats the parsed list to get rid of it
                     else:
                         print("Your board is not possible. Please only use letters and the number 2. Check for spaces.")
-    print("Coords of double tiles: "+ double_coords)
+    print("Coords of double tiles: ", double_coords)
+    print("Clean Board: ", parsed_board_no_doubles)
 
-    return double_coords, parsed_board
+    return double_coords, parsed_board_no_doubles
 
 
 
