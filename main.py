@@ -19,7 +19,7 @@ WWWW/XX2XX/Y2YYY/ZZZZ
 '''
 
 # Make tests?
-
+# Remember to keep track of coordinatse of words for doubling - i can incrememnet a counter if it is the same
 
 #use my own sorting algoirhm for practice?
 def main():
@@ -82,21 +82,21 @@ def get_diamensions(parsed_board):
 
 
 def find_double_coords(parsed_board, diamensions):
+    """Obtains the coordinates of double points locations and returns them as a list of tuples"""
     
     double_coords = []
     rows = diamensions[0]
     letters_per_row = diamensions[1]
-    parsed_board_no_doubles = copy.deepcopy(parsed_board)
+    parsed_board_no_doubles = copy.deepcopy(parsed_board)  # need to deepcopy to not affect original, else index errors will occur
 
     for row in range(rows):
         current_row = parsed_board[row]
         current_row_length = len(current_row)
-        if current_row_length != letters_per_row: # Number of letters in a line
+        if current_row_length != letters_per_row: # If there are non-letter characters in the row
             
 
             for character_index in range(current_row_length):
                 character = parsed_board[row][character_index]
-                print(character_index, character)
 
                 if character not in LETTERS_LIST:
 
