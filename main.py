@@ -26,11 +26,10 @@ WWWW/XX2XX/Y2YYY/ZZZZ
 #use my own sorting algoirhm for practice?
 
 class Node():
-    def __init__(self, letter: str, coords:tuple, double: bool, neighbours:list):
+    def __init__(self, letter: str, coords:tuple, double: bool):
         self.letter = letter
+        self.coords = coords
         self.double = double
-        self.coords= coords
-        self.neighbours = neighbours
 
 
 def main():
@@ -39,9 +38,9 @@ def main():
     diamensions = get_diamensions(parsed_board_with_doubles)
     double_coords, parsed_board_no_doubles = find_double_coords(parsed_board_with_doubles, diamensions)
     parsed_board_oop = parse_board_into_oop(parsed_board_no_doubles, diamensions, double_coords)
-    all_letter_combos = find_all_letter_combos(parsed_board_no_doubles)
+    all_letter_combos = find_all_letter_combos(parsed_board_oop)
     words = find_words(all_letter_combos)
-    points = count_points(parsed_board_no_doubles, double_squares, words)
+    points = count_points(parsed_board_oop, double_squares, words)
     print(words)
     print(points)
 
@@ -126,32 +125,23 @@ def find_double_coords(parsed_board, diamensions):
 def parse_board_into_oop(original_board, diamensions, double_coords):
     new_board = []
 
-    for row_index in range(len(board)):
+    for row_index in range(len(original_board)):
         new_board.append([])
-        for letter_index in range(len(board[row_index])):
-            letter = board[row_index][letter_index]
-            cooords = (row_index, letter_index)
+        for letter_index in range(len(original_board[row_index])):
+            letter = original_board[row_index][letter_index]
+            coords = (row_index, letter_index)
             double = coords in double_coords
-            neighbours = [neighbour_coord for neighbour_coord in ]
-            new_board[row].append(Node(letter=letter, coords=coords, double=double, neighbours=neighbours))
+            new_board[row_index].append(Node(letter=letter, coords=coords, double=double))
+
+    return new_board
 
 
 def find_all_letter_combos(board):
-    for row in range(len(board)):
-        for letter in range(len(row)):
-            pass
+    
 
 
     #Make sure it cannot go back on itself as it is not allowed
     # And also would lead to an infinite loop
-
-
-
-    neighbours_xy = [ # From 0,0
-        (x-1,y+1), (x,y+1), (x+1,y+1),
-        (x-1,y), (x+1,y), # Middle is where x,y would be
-        (x-1,y-1), (x,y-1), (x+1,y-1)
-    ]
     return NotImplementedError
 
 
