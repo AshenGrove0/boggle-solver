@@ -24,20 +24,22 @@ WWWW/XX2XX/Y2YYY/ZZZZ
 #use my own sorting algoirhm for practice?
 def main():
     raw_board = get_board()
-    parsed_board = parse_board(raw_board)
-    diamensions = get_diamensions(parsed_board)
-    double_coords, parsed_board_no_doubles = find_double_coords(parsed_board, diamensions)
+    parsed_board_with_doubles = parse_board(raw_board)
+    diamensions = get_diamensions(parsed_board_with_doubles)
+    double_coords, parsed_board_no_doubles = find_double_coords(parsed_board_with_doubles, diamensions)
     all_letter_combos = find_all_letter_combos(parsed_board_no_doubles)
     words = find_words(all_letter_combos)
-    points = count_points(parsed_board, double_squares, words)
+    points = count_points(parsed_board_no_doubles, double_squares, words)
     print(words)
     print(points)
 
 
 
 def get_board():
+    """Gets the board from the user as input but does not format"""
     board = input("Board: ") # Board in format WWWW/XXXX/YYYY/ZZZZ where 2 is placed following the letter it doubles
     return board
+
 
 def parse_board(raw_board):
     """Converts the raw board into a 2d list format"""
@@ -62,7 +64,6 @@ def parse_board(raw_board):
     return parsed_board
     
 
-
 def get_diamensions(parsed_board):
     '''Gets the diamensions for the board, allowing it to work as a rectangle'''
 
@@ -75,10 +76,8 @@ def get_diamensions(parsed_board):
     for letter in parsed_board[0]:
         if letter in LETTERS_LIST:
             line_length += 1
-    print(line_length)
 
     return (line_count, line_length)
-
 
 
 def find_double_coords(parsed_board, diamensions):
@@ -105,21 +104,25 @@ def find_double_coords(parsed_board, diamensions):
                         parsed_board_no_doubles[row].remove(character) # Formats the parsed list to get rid of it
                     else:
                         print("Your board is not possible. Please only use letters and the number 2. Check for spaces.")
+
     print("Coords of double tiles: ", double_coords)
     print("Clean Board: ", parsed_board_no_doubles)
 
     return double_coords, parsed_board_no_doubles
 
 
-
+def find_all_letter_combos(parsed_board_no_doubles):
+    return NotImplementedError
 
 
 def find_words(board):
     with open("safedict_full.txt", "r") as words:
         words_list = words.readlines()
-        if my_word in words_list:
-            print("Found")
+        return NotImplementedError
+        
 
+def count_points(parsed_board, double_squares, words):
+    return NotImplementedError
 
 if __name__ == "__main__":
     main()
