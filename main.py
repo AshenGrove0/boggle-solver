@@ -1,7 +1,7 @@
 # main.py
 import string
 import copy
-
+import networkx as nx 
 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -17,16 +17,28 @@ WWWW/XX2XX/Y2YYY/ZZZZ
 
 
 '''
-
+# Get input from an image?
 # Make tests?
 # Remember to keep track of coordinatse of words for doubling - i can incrememnet a counter if it is the same
 
+#Get a better dictionary
+
 #use my own sorting algoirhm for practice?
+
+class Node():
+    def __init__(self, letter: str, coords:tuple, double: bool, neighbours:list):
+        self.letter = letter
+        self.double = double
+        self.coords= coords
+        self.neighbours = neighbours
+
+
 def main():
     raw_board = get_board()
     parsed_board_with_doubles = parse_board(raw_board)
     diamensions = get_diamensions(parsed_board_with_doubles)
     double_coords, parsed_board_no_doubles = find_double_coords(parsed_board_with_doubles, diamensions)
+    parsed_board_oop = parse_board_into_oop(parsed_board_no_doubles, diamensions, double_coords)
     all_letter_combos = find_all_letter_combos(parsed_board_no_doubles)
     words = find_words(all_letter_combos)
     points = count_points(parsed_board_no_doubles, double_squares, words)
@@ -50,6 +62,7 @@ def parse_board(raw_board):
     parsed_board = raw_board.split("/")
     for row in range(len(parsed_board)):
         parsed_board[row] = list(parsed_board[row])
+
     print(parsed_board)
 
     '''
@@ -81,7 +94,7 @@ def get_diamensions(parsed_board):
 
 
 def find_double_coords(parsed_board, diamensions):
-    """Obtains the coordinates of double points locations and returns them as a list of tuples"""
+    """Gets the coordinates of double points locations and returns them as a list of tuples"""
     
     double_coords = []
     rows = diamensions[0]
@@ -110,13 +123,40 @@ def find_double_coords(parsed_board, diamensions):
 
     return double_coords, parsed_board_no_doubles
 
+def parse_board_into_oop(original_board, diamensions, double_coords):
+    new_board = []
 
-def find_all_letter_combos(parsed_board_no_doubles):
+    for row_index in range(len(board)):
+        new_board.append([])
+        for letter_index in range(len(board[row_index])):
+            letter = board[row_index][letter_index]
+            cooords = (row_index, letter_index)
+            double = coords in double_coords
+            neighbours = [neighbour_coord for neighbour_coord in ]
+            new_board[row].append(Node(letter=letter, coords=coords, double=double, neighbours=neighbours))
+
+
+def find_all_letter_combos(board):
+    for row in range(len(board)):
+        for letter in range(len(row)):
+            pass
+
+
+    #Make sure it cannot go back on itself as it is not allowed
+    # And also would lead to an infinite loop
+
+
+
+    neighbours_xy = [ # From 0,0
+        (x-1,y+1), (x,y+1), (x+1,y+1),
+        (x-1,y), (x+1,y), # Middle is where x,y would be
+        (x-1,y-1), (x,y-1), (x+1,y-1)
+    ]
     return NotImplementedError
 
 
 def find_words(board):
-    with open("safedict_full.txt", "r") as words:
+    with open("10000words.txt", "r") as words:
         words_list = words.readlines()
         return NotImplementedError
         
