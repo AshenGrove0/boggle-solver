@@ -140,10 +140,20 @@ def find_all_letter_combos(board):
     
 
 
-    #Make sure it cannot go back on itself as it is not allowed
+    # Make sure it cannot go back on itself as it is not allowed
     # And also would lead to an infinite loop
     # I could do the network thing but i think it would be 
     # safer to not do that and just do the square
+
+    # Routes list  = []
+    # 1. Create a new route in list
+    # 2. Check in a square around it until it has reached a coordinate that 
+
+    # A list of every combination of x and y where the difference is +- 1 each and loop through each one
+    # and then move onto the next item in the row as a starting letter
+
+
+    # Get every route from a to b and do that for all of the starting and finishing letters
     return NotImplementedError
 
 
