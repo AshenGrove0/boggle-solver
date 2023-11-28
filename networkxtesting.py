@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Object():
     def __init__(self, value):
@@ -11,11 +12,17 @@ graph = nx.MultiDiGraph()
 
 
 edge_list = [(1,2),(2,3),(3,4),(4,1),(3,1),(2,4)]
+'''
+#g = nx.from_numpy_array(np.array([[0,1,0],
+          [1,1,1],
+          [0,0,0]]))'''
 
 g = nx.Graph()
+
 g.add_edges_from(edge_list)
-print(nx.adjacency_matrix)
-nx.draw_spring(g, with_labels=True)
+print(nx.adjacency_matrix(g))
+#nx.draw_spring(g, with_labels=True)
+nx.draw_circular(g, with_labels=True)
 
 plt.show()
 
