@@ -11,18 +11,23 @@ o1 = Object(12)
 graph = nx.MultiDiGraph()
 
 
-edge_list = [(1,2),(2,3),(3,4),(4,1),(3,1),(2,4)]
+edge_list = [(1,2),(2,3),(4,1),(3,1),(2,5), (5,1), (5,6)]
 '''
-#g = nx.from_numpy_array(np.array([[0,1,0],
+g = nx.from_numpy_array(np.array([[0,1,0],
           [1,1,1],
           [0,0,0]]))'''
 
+#g = nx.complete_graph(5)
+
+
 g = nx.Graph()
 
+
 g.add_edges_from(edge_list)
-print(nx.adjacency_matrix(g))
-#nx.draw_spring(g, with_labels=True)
-nx.draw_circular(g, with_labels=True)
+print(dict(g.degree))
+#print(nx.adjacency_matrix(g))
+nx.draw_spring(g, with_labels=True)
+#nx.draw_shell(g, with_labels=True)
 
 plt.show()
 
