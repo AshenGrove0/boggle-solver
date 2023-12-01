@@ -10,7 +10,6 @@ o1 = Object(12)
 
 graph = nx.MultiDiGraph()
 
-
 edge_list = [(1,2),(2,3),(4,1),(3,1),(2,5), (5,1), (5,6)]
 '''
 g = nx.from_numpy_array(np.array([[0,1,0],
