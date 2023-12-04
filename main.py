@@ -14,6 +14,7 @@ LETTERS_LIST = LOWERCASE_LETTERS + UPPERCASE_LETTERS
 '''
 WWWW/XXXX/YYYY/ZZZZ
 WWWW/XX2XX/Y2YYY/ZZZZ
+AAAA/BBBB/CCCC/EEEE
 
 
 '''
@@ -138,9 +139,16 @@ def parse_board_into_oop(original_board, diamensions, double_coords):
 
 def find_all_letter_combos(board):
     # 1. Find all combos of 2 positions (all start and end coords)
+    all_start_and_end_nodes = []
+    for row in board:
+        for letter in row:
+            all_start_and_end_nodes.append(letter)
+    print(all_start_and_end_nodes)
     # 2. Make a network of the board
+    
     # 3. Use the command to get all paths from start to end coords
     # 4. Done?
+    
     return NotImplementedError
 
 
