@@ -2,6 +2,7 @@
 import string
 import copy
 import networkx as nx 
+from itertools import product
 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -139,11 +140,16 @@ def parse_board_into_oop(original_board, diamensions, double_coords):
 
 def find_all_letter_combos(board):
     # 1. Find all combos of 2 positions (all start and end coords)
-    all_start_and_end_nodes = []
+    all_nodes = []
     for row in board:
         for letter in row:
-            all_start_and_end_nodes.append(letter)
+            all_nodes.append(letter)
+    print(all_nodes)
+    # We now have all nodes
+    # Getting all node combinations:
+    all_start_and_end_nodes = list(product(all_nodes, all_nodes))
     print(all_start_and_end_nodes)
+
     # 2. Make a network of the board
     
     # 3. Use the command to get all paths from start to end coords
