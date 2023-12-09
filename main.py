@@ -151,7 +151,7 @@ def find_all_letter_combos(board):
     print(all_start_and_end_nodes)
 
     # 2. Make a network of the board
-    
+    ## Loop thorugh the coords and create a list of links of node.coords(-1+1...) and do that for each node?
     # 3. Use the command to get all paths from start to end coords
     # 4. Done?
 
