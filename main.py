@@ -149,9 +149,33 @@ def find_all_letter_combos(board):
     # Getting all node combinations:
     all_start_and_end_nodes = list(product(all_nodes, all_nodes))
     print(all_start_and_end_nodes)
+    all_start_and_end_nodes_coords = []
+    for node_pair in all_start_and_end_nodes:
+        for node in node_pair:
+            node_pair_coords = []
+            node_pair_coords += node.coords()
+        all_start_and_end_nodes_coords += node_pair
+    all_start_and_end_nodes_with_coords_dict = dict(zip(all_start_and_end_nodes, all_start_and_end_nodes_coords))
+            
 
     # 2. Make a network of the board
     ## Loop thorugh the coords and create a list of links of node.coords(-1+1...) and do that for each node?
+    edges = []
+    for node in all_start_and_end_nodes_with_coords_dict:
+        x = node.value()[0]
+        x = node.value()[1]
+        adjacent_coords = [
+            (x + 1, y),
+            (x - 1, y),
+            (x, y + 1),
+            (x, y - 1),
+            (x + 1, y + 1),
+            (x - 1, y + 1),
+            (x + 1, y - 1),
+            (x - 1, y - 1)
+        ]
+        edges += (node.value(), adjacent_coords)
+        
     # 3. Use the command to get all paths from start to end coords
     # 4. Done?
 
