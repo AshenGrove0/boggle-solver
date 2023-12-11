@@ -3,6 +3,7 @@ import string
 import copy
 import networkx as nx 
 from itertools import product
+import matplotlib.pyplot as plt
 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -16,6 +17,9 @@ LETTERS_LIST = LOWERCASE_LETTERS + UPPERCASE_LETTERS
 WWWW/XXXX/YYYY/ZZZZ
 WWWW/XX2XX/Y2YYY/ZZZZ
 AAAA/BBBB/CCCC/EEEE
+ABCD/EFGH/IJKL/MMNO
+
+
 
 
 '''
@@ -144,16 +148,18 @@ def find_all_letter_combos(board):
     for row in board:
         for letter in row:
             all_nodes.append(letter)
-    print(all_nodes)
+    # print(all_nodes)
     # We now have all nodes
     # Getting all node combinations:
     all_start_and_end_nodes = list(product(all_nodes, all_nodes))
-    print(all_start_and_end_nodes)
+    #print(all_start_and_end_nodes)
     all_start_and_end_nodes_coords = []
     for node_pair in all_start_and_end_nodes:
+        
         for node in node_pair:
+            #print(node)
             node_pair_coords = []
-            node_pair_coords += node.coords()
+            node_pair_coords += node.coords
         all_start_and_end_nodes_coords += node_pair
     all_start_and_end_nodes_with_coords_dict = dict(zip(all_start_and_end_nodes, all_start_and_end_nodes_coords))
             
@@ -161,11 +167,13 @@ def find_all_letter_combos(board):
     # 2. Make a network of the board
     ## Loop thorugh the coords and create a list of links of node.coords(-1+1...) and do that for each node?
     edges = []
-    for node in all_start_and_end_nodes_with_coords_dict:
-        x = node.value()[0]
-        x = node.value()[1]
+    for node in all_nodes:
+        print(node.letter)
+    for node in all_nodes:
+        x = node.coords[0]
+        y = node.coords[1]
         adjacent_coords = [
-            (x + 1, y),
+            (x + 1, y),  
             (x - 1, y),
             (x, y + 1),
             (x, y - 1),
@@ -174,7 +182,24 @@ def find_all_letter_combos(board):
             (x + 1, y - 1),
             (x - 1, y - 1)
         ]
-        edges += (node.value(), adjacent_coords)
+        
+        adjacent_nodes = []
+        
+        for coords in adjacent_coords:
+            for node in all_nodes:
+                if node.coords == coords:
+                    adjacent_nodes.append(node) 
+        
+        for node in all_nodes:
+            for adjacent_node in adjacent_nodes:
+                edges.append((node.letter, adjacent_node.letter)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
+                                                                  # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
+        
+        edge_list = list(edges)
+        G = nx.Graph()
+        G.add_edges_from(edge_list)
+        nx.draw_shell(G, with_labels=True)
+        plt.show()
         
     # 3. Use the command to get all paths from start to end coords
     # 4. Done?
@@ -182,7 +207,7 @@ def find_all_letter_combos(board):
     return NotImplementedError
 
 
-def find_words(board):
+def find_words(all_letter_combos):
     with open("10000words.txt", "r") as words:
         words_list = words.readlines()
         return NotImplementedError
