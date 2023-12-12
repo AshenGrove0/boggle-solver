@@ -4,6 +4,7 @@ import copy
 import networkx as nx 
 from itertools import product
 import matplotlib.pyplot as plt
+import math
 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -159,8 +160,8 @@ def find_all_letter_combos(board):
         for node in node_pair:
             #print(node)
             node_pair_coords = []
-            node_pair_coords += node.coords
-        all_start_and_end_nodes_coords += node_pair
+            node_pair_coords += (node.coords)
+        all_start_and_end_nodes_coords += node_pair_coords
     all_start_and_end_nodes_with_coords_dict = dict(zip(all_start_and_end_nodes, all_start_and_end_nodes_coords))
             
 
@@ -189,11 +190,15 @@ def find_all_letter_combos(board):
             for node in all_nodes:
                 if node.coords == coords:
                     adjacent_nodes.append(node) 
-        
+                    
+        # Debugging Purposes
+        edges_info = []
         for node in all_nodes:
             for adjacent_node in adjacent_nodes:
-                edges.append((node.letter, adjacent_node.letter)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
-                                                                  # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
+                if (abs(node.coords[0] - adjacent_node.coords[0]) <= 1 or abs(adjacent_node.coords[0] - node.coords[0]) <= 1) and (abs(node.coords[1] - adjacent_node.coords[1]) <= 1 or abs(adjacent_node.coords[1] - node.coords[1] <= 1)):
+                    edges_info.append((node.letter, node.coords, adjacent_node.letter, adjacent_node.coords))
+                    edges.append((node.letter, adjacent_node.letter)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
+                                                                    # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
         
         edge_list = list(edges)
         G = nx.Graph()
