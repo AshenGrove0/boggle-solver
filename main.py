@@ -18,7 +18,7 @@ LETTERS_LIST = LOWERCASE_LETTERS + UPPERCASE_LETTERS
 WWWW/XXXX/YYYY/ZZZZ
 WWWW/XX2XX/Y2YYY/ZZZZ
 AAAA/BBBB/CCCC/EEEE
-ABCD/EFGH/IJKL/MMNO
+ABCD/EFGH/IJKL/MNOP
 
 
 
@@ -195,7 +195,7 @@ def find_all_letter_combos(board):
         edges_info = []
         for node in all_nodes:
             for adjacent_node in adjacent_nodes:
-                if (abs(node.coords[0] - adjacent_node.coords[0]) <= 1 or abs(adjacent_node.coords[0] - node.coords[0]) <= 1) and (abs(node.coords[1] - adjacent_node.coords[1]) <= 1 or abs(adjacent_node.coords[1] - node.coords[1] <= 1)):
+                if abs(node.coords[0] - adjacent_node.coords[0]) <= 1 and abs(node.coords[1] - adjacent_node.coords[1]) <= 1: #Dont need the inverses as their absolute values are the same
                     edges_info.append((node.letter, node.coords, adjacent_node.letter, adjacent_node.coords))
                     edges.append((node.letter, adjacent_node.letter)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
                                                                     # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
@@ -207,15 +207,24 @@ def find_all_letter_combos(board):
         plt.show()
         
     # 3. Use the command to get all paths from start to end coords
+    
     # 4. Done?
 
     return NotImplementedError
 
 
-def find_words(all_letter_combos):
+def find_words(all_letter_combos, all_letter_combos_paths):
     with open("10000words.txt", "r") as words:
         words_list = words.readlines()
-        return NotImplementedError
+        words = []
+        paths_used = []
+        for combo_index in range(len(all_letter_combos)):
+            combo = all_letter_combos[combo_index]
+            if len(combo) >= 3 and combo in words_list:
+                words += combo
+                paths_used += all_letter_combo_paths[combo_index]
+            
+        return words, paths_used
         
 
 def count_points(parsed_board, double_squares, words):
