@@ -170,10 +170,11 @@ def find_all_letter_combos(board):
     edges = []
     for node in all_nodes:
         print(node.letter)
+    adjacent_coords = []
     for node in all_nodes:
         x = node.coords[0]
         y = node.coords[1]
-        adjacent_coords = [
+        adjacent_coords += [
             (x + 1, y),  
             (x - 1, y),
             (x, y + 1),
@@ -184,27 +185,27 @@ def find_all_letter_combos(board):
             (x - 1, y - 1)
         ]
         
-        adjacent_nodes = []
-        
-        for coords in adjacent_coords:
-            for node in all_nodes:
-                if node.coords == coords:
-                    adjacent_nodes.append(node) 
-                    
-        # Debugging Purposes
-        edges_info = []
+    adjacent_nodes = []
+    
+    for coords in adjacent_coords:
         for node in all_nodes:
-            for adjacent_node in adjacent_nodes:
-                if abs(node.coords[0] - adjacent_node.coords[0]) <= 1 and abs(node.coords[1] - adjacent_node.coords[1]) <= 1: #Dont need the inverses as their absolute values are the same
-                    edges_info.append((node.letter, node.coords, adjacent_node.letter, adjacent_node.coords))
-                    edges.append((node.letter, adjacent_node.letter)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
-                                                                    # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
+            if node.coords == coords:
+                adjacent_nodes.append(node) 
+                
+    # Debugging Purposes
+    edges_info = []
+    for node in all_nodes:
+        for adjacent_node in adjacent_nodes:
+            if abs(node.coords[0] - adjacent_node.coords[0]) <= 1 and abs(node.coords[1] - adjacent_node.coords[1]) <= 1: #Dont need the inverses as their absolute values are the same
+                edges_info.append((node.letter, node.coords, adjacent_node.letter, adjacent_node.coords))
+                edges.append((node.letter, adjacent_node.letter)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
+                                                                # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
         
-        edge_list = list(edges)
-        G = nx.Graph()
-        G.add_edges_from(edge_list)
-        nx.draw_shell(G, with_labels=True)
-        plt.show()
+    edge_list = list(edges)
+    G = nx.Graph()
+    G.add_edges_from(edge_list)
+    nx.draw_spring(G, with_labels=True)
+    plt.show()
         
     # 3. Use the command to get all paths from start to end coords
     
