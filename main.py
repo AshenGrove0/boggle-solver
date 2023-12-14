@@ -5,6 +5,8 @@ import networkx as nx
 from itertools import product
 import matplotlib.pyplot as plt
 from progress.bar import Bar
+import time
+
 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -21,6 +23,7 @@ AAAA/BBBB/CCCC/EEEE
 ABCD/EFGH/IJKL/MNOP
 EA/RT/ON/SL
 FEOV/YIG2T/SNNW/AIHI
+ABC/DEF/GHI/JKL
 
 
 '''
@@ -40,6 +43,7 @@ class Node():
 
 
 def main():
+    start_time = time.time()
     raw_board = get_board()
     parsed_board_with_doubles = parse_board(raw_board)
     diamensions = get_diamensions(parsed_board_with_doubles)
@@ -47,9 +51,11 @@ def main():
     parsed_board_oop = parse_board_into_oop(parsed_board_no_doubles, diamensions, double_coords)
     all_letter_combos_paths = find_all_letter_combos(parsed_board_oop)
     words = find_words(all_letter_combos_paths)
-    points = count_points(parsed_board_oop, double_squares, words)
-    print(words)
-    print(points)
+    # points = count_points(parsed_board_oop, double_squares, words)
+    end_time = time.time() - start_time
+    print(f"Time taken: {end_time}")
+    #print(words)
+    #print(points)
 
 
 
@@ -226,6 +232,7 @@ def find_all_letter_combos(board):
 
 
 def find_words(all_letter_combos_paths):
+    """This crashes with a real board so i should make it slightly more efficient """
     finding_potential_words_bar = Bar('Finding Potential Words', max=len(all_letter_combos_paths))
     potential_words = []
     for path in all_letter_combos_paths:
@@ -240,7 +247,7 @@ def find_words(all_letter_combos_paths):
     finding_potential_words_bar.finish()
     
     with open("10000words.txt", "r") as words: 
-        """This should be predone!!"""
+        """This should be predone!! and also remove all words less than 3 letters long"""
         words_list = words.readlines()
         cleaning_dict_bar = Bar('Cleaning Dictionary', max=len(words_list))
         cleaned_words_list = []
@@ -254,8 +261,8 @@ def find_words(all_letter_combos_paths):
 
         letter_combos_longer_than_three = []
         
-        finding_correct_words_bar_1 = Bar("Finding Words Check 1/2", max= len(all_words_in_board))
-        for word in all_words_in_board:
+        finding_correct_words_bar_1 = Bar("Finding Words Check 1/2", max= len(potential_words))
+        for word in potential_words:
             #print(word)
             if len(word) >= 3:
                 letter_combos_longer_than_three.append(word)
@@ -264,7 +271,7 @@ def find_words(all_letter_combos_paths):
         
         
         
-        finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(potential_words))
+        finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(letter_combos_longer_than_three))
         all_words_in_board = []
         paths_used = []
         final_words =[]
