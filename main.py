@@ -252,22 +252,31 @@ def find_words(all_letter_combos_paths):
             cleaned_words_list.append(cleaned_word)
         cleaning_dict_bar.finish()
 
-        finding_correct_words_bar = Bar("Finding Words", max= len(potential_words))
-        all_words_in_board = []
-        paths_used = []
-        final_words =[]
-        for potential_word in potential_words:
-            finding_correct_words_bar.next()
-            if str(potential_word) in cleaned_words_list:
-                all_words_in_board.append(potential_word)
-                #print(potential_word)
-                #Deal with double points tagging here if i can be bothered
-                
+        letter_combos_longer_than_three = []
+        
+        finding_correct_words_bar_1 = Bar("Finding Words Check 1/2", max= len(all_words_in_board))
         for word in all_words_in_board:
             #print(word)
             if len(word) >= 3:
-                final_words.append(word)
-        finding_correct_words_bar.finish()
+                letter_combos_longer_than_three.append(word)
+            finding_correct_words_bar_1.next()
+        finding_correct_words_bar_1.finish()
+        
+        
+        
+        finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(potential_words))
+        all_words_in_board = []
+        paths_used = []
+        final_words =[]
+        for potential_word in letter_combos_longer_than_three:
+            finding_correct_words_bar_2.next()
+            if str(potential_word) in cleaned_words_list:
+                final_words.append(potential_word)
+                #print(potential_word)
+                #Deal with double points tagging here if i can be bothered
+        finding_correct_words_bar_2.finish()     
+        
+    
                 
         print(f"Final words:{final_words}")
         return words, paths_used
