@@ -23,13 +23,16 @@ AAAA/BBBB/CCCC/EEEE
 ABCD/EFGH/IJKL/MNOP
 EA/RT/ON/SL
 FEOV/YIG2T/SNNW/AIHI
-A
-AB/CD - 1.59s
-ABC/DEF/GHI - 7.15s
-ABCD/EFGH/IJKL/MNOP
+ABC/DEF/GHI/JKL
+
 '''
+# Get input from an image?
+# Make tests?
+# Remember to keep track of coordinatse of words for doubling - i can incrememnet a counter if it is the same
 
+#Get a better dictionary
 
+#use my own sorting algoirhm for practice?
 
 class Node():
     def __init__(self, letter: str, coords:tuple, double: bool):
@@ -227,16 +230,10 @@ def find_all_letter_combos(board):
 
 
 
-def find_words(all_letter_combos_paths_old):
+def find_words(all_letter_combos_paths):
     """This crashes with a real board so i should make it slightly more efficient """
-    finding_potential_words_bar = Bar('Finding Potential Words', max=len(all_letter_combos_paths_old))
-    potential_words_old = []
-    all_letter_combos_paths = []
-    for path in all_letter_combos_paths_old:
-        path = tuple(path)
-        all_letter_combos_paths.append(set(path))
-    
-    
+    finding_potential_words_bar = Bar('Finding Potential Words', max=len(all_letter_combos_paths))
+    potential_words = []
     for path in all_letter_combos_paths:
         finding_potential_words_bar.next()
         new_word = ""
@@ -244,7 +241,7 @@ def find_words(all_letter_combos_paths_old):
             #print(node.letter)
             new_word += node.letter
             #print(new_word)
-        potential_words_old.append(new_word)
+        potential_words.append(new_word)
     #print(potential_words)
     finding_potential_words_bar.finish()
     
@@ -261,31 +258,20 @@ def find_words(all_letter_combos_paths_old):
             cleaned_words_list.append(cleaned_word)
         cleaning_dict_bar.finish()
 
-        letter_combos_longer_than_three_old = []
-        potential_words = []
-        for word in potential_words_old:
-            word = tuple(word)
-            potential_words.append(set(word))
-        
+        letter_combos_longer_than_three = []
         
         finding_correct_words_bar_1 = Bar("Finding Words Check 1/2", max= len(potential_words))
         for word in potential_words:
             #print(word)
             if len(word) >= 3:
-                letter_combos_longer_than_three_old.append(word)
+                letter_combos_longer_than_three.append(word)
             finding_correct_words_bar_1.next()
         finding_correct_words_bar_1.finish()
         
         
         
-        finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(letter_combos_longer_than_three_old))
-        
-        letter_combos_longer_than_three = []
-        for word in letter_combos_longer_than_three_old:
-            word = tuple(word)
-            letter_combos_longer_than_three.append(set(word))
-            
-            
+        finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(letter_combos_longer_than_three))
+        all_words_in_board = []
         paths_used = []
         final_words =[]
         for potential_word in letter_combos_longer_than_three:
