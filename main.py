@@ -25,7 +25,6 @@ EA/RT/ON/SL
 FEOV/YIG2T/SNNW/AIHI
 ABC/DEF/GHI/JKL
 
-
 '''
 # Get input from an image?
 # Make tests?
