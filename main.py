@@ -45,7 +45,7 @@ def main():
     parsed_board_oop = parse_board_into_oop(parsed_board_no_doubles, diamensions, double_coords)
     all_letter_combos_paths = find_all_letter_combos(parsed_board_oop)
     words, double_words = find_words(all_letter_combos_paths)
-    points = count_points(parsed_board_oop, double_words)
+    points = count_points(words, double_words)
     print(f"Words: {words}")
     print(f"Points (if no doubles): {points}")
     print(f"Time: {time.time() - start_time}")
@@ -228,6 +228,7 @@ def find_words(all_letter_combos_paths):
 
 def count_points(words, double_words):
     points = 0
+    print(words)
     for word in words:
         match len(word):
             case 3:
