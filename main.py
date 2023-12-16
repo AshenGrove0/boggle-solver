@@ -6,10 +6,8 @@ from itertools import product
 import matplotlib.pyplot as plt
 from progress.bar import Bar
 import time
-import itertools
-import cProfile
 import concurrent.futures
- #Get better dictionary?
+
  
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
@@ -46,8 +44,11 @@ def main():
     double_coords, parsed_board_no_doubles = find_double_coords(parsed_board_with_doubles, diamensions)
     parsed_board_oop = parse_board_into_oop(parsed_board_no_doubles, diamensions, double_coords)
     all_letter_combos_paths = find_all_letter_combos(parsed_board_oop)
-    words = find_words(all_letter_combos_paths)
-    print(f"Time taken: {time.time() - start_time}")
+    words, double_words = find_words(all_letter_combos_paths)
+    points = count_points(parsed_board_oop, double_words)
+    print(f"Words: {words}")
+    print(f"Points (if no doubles): {points}")
+    print(f"Time: {time.time() - start_time}")
 
 
 
@@ -221,9 +222,32 @@ def find_words(all_letter_combos_paths):
         
         final_words = [word for word in letter_combos_longer_than_three if len(word) >= 3]
         finding_correct_words_bar_2.finish()     
-        
-        print(f"Final words:{final_words}")
+        double_words = []
+        return final_words, double_words
     
+
+def count_points(words, double_words):
+    points = 0
+    for word in words:
+        match len(word):
+            case 3:
+                points += 1
+            case 4:
+                points += 1
+            case 5:
+                points += 2
+            case 6:
+                points += 3
+            case 7:
+                points += 5
+            case _:  # >=8
+                points += 11
+    return points
+                
+            
+
+
+
 
 if __name__ == "__main__":
     main()
