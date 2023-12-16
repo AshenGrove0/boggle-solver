@@ -6,8 +6,11 @@ from itertools import product
 import matplotlib.pyplot as plt
 from progress.bar import Bar
 import time
-
-
+import itertools
+import cProfile
+import concurrent.futures
+ #Get better dictionary?
+ 
 # Get lowercase and uppercase letters
 LOWERCASE_LETTERS = list(string.ascii_lowercase)
 UPPERCASE_LETTERS = list(string.ascii_uppercase)
@@ -23,38 +26,28 @@ AAAA/BBBB/CCCC/EEEE
 ABCD/EFGH/IJKL/MNOP
 EA/RT/ON/SL
 FEOV/YIG2T/SNNW/AIHI
-ABC/DEF/GHI/JKL
+ABC/DEF/GHI
+AAA/BBB/CCC/DDD
 
 '''
-# Get input from an image?
-# Make tests?
-# Remember to keep track of coordinatse of words for doubling - i can incrememnet a counter if it is the same
-
-#Get a better dictionary
-
-#use my own sorting algoirhm for practice?
 
 class Node():
-    def __init__(self, letter: str, coords:tuple, double: bool):
+    def __init__(self, letter: str, coords:tuple, is_double: bool):
         self.letter = letter
         self.coords = coords
-        self.double = double
+        self.is_double = is_double
 
 
 def main():
-    start_time = time.time()
     raw_board = get_board()
+    start_time = time.time()
     parsed_board_with_doubles = parse_board(raw_board)
     diamensions = get_diamensions(parsed_board_with_doubles)
     double_coords, parsed_board_no_doubles = find_double_coords(parsed_board_with_doubles, diamensions)
     parsed_board_oop = parse_board_into_oop(parsed_board_no_doubles, diamensions, double_coords)
     all_letter_combos_paths = find_all_letter_combos(parsed_board_oop)
     words = find_words(all_letter_combos_paths)
-    # points = count_points(parsed_board_oop, double_squares, words)
-    end_time = time.time() - start_time
-    print(f"Time taken: {end_time}")
-    #print(words)
-    #print(points)
+    print(f"Time taken: {time.time() - start_time}")
 
 
 
@@ -66,15 +59,7 @@ def get_board():
 
 def parse_board(raw_board):
     """Converts the raw board into a 2d list format"""
-
-    parsed_board = []
-
-    # Converts the board into a 2d list
-    parsed_board = raw_board.split("/")
-    for row in range(len(parsed_board)):
-        parsed_board[row] = list(parsed_board[row])
-
-    print(parsed_board)
+    parsed_board = [list(row) for row in raw_board.split("/")]
 
     '''
     Format:
@@ -107,7 +92,7 @@ def get_diamensions(parsed_board):
 def find_double_coords(parsed_board, diamensions):
     """Gets the coordinates of double points locations and returns them as a list of tuples"""
     
-    double_coords = []
+    double_coords = set()
     rows = diamensions[0]
     letters_per_row = diamensions[1]
     parsed_board_no_doubles = copy.deepcopy(parsed_board)  # need to deepcopy to not affect original, else index errors will occur
@@ -124,7 +109,7 @@ def find_double_coords(parsed_board, diamensions):
                 if character not in LETTERS_LIST:
 
                     if character == 2 or character == "2":
-                        double_coords.append(tuple((row, character_index))) # Adds it to the list
+                        double_coords.add(tuple((row, character_index))) # Adds it to the list
                         parsed_board_no_doubles[row].remove(character) # Formats the parsed list to get rid of it
                     else:
                         print("Your board is not possible. Please only use letters and the number 2. Check for spaces.")
@@ -143,44 +128,23 @@ def parse_board_into_oop(original_board, diamensions, double_coords):
             letter = original_board[row_index][letter_index]
             coords = (row_index, letter_index)
             double = coords in double_coords
-            new_board[row_index].append(Node(letter=letter, coords=coords, double=double))
+            new_board[row_index].append(Node(letter=letter, coords=coords, is_double=double))
 
     return new_board
 
 
 def find_all_letter_combos(board):
-    # 1. Find all combos of 2 positions (all start and end coords)
-    all_nodes = []
-    for row in board:
-        for letter in row:
-            all_nodes.append(letter)
-    # print(all_nodes)
-    # We now have all nodes
-    # Getting all node combinations:
-    all_start_and_end_nodes = list(product(all_nodes, all_nodes))
-    #print(all_start_and_end_nodes)
-    all_start_and_end_nodes_coords = []
-    for node_pair in all_start_and_end_nodes:
-        
-        for node in node_pair:
-            #print(node)
-            node_pair_coords = []
-            node_pair_coords += (node.coords)
-        all_start_and_end_nodes_coords += node_pair_coords
-    all_start_and_end_nodes_with_coords_dict = dict(zip(all_start_and_end_nodes, all_start_and_end_nodes_coords))
-            
-
-    # 2. Make a network of the board
-    ## Loop thorugh the coords and create a list of links of node.coords(-1+1...) and do that for each node?
+    """Turns board into network & Finds all letter combos"""
     edges = []
-    # for node in all_nodes:
-    #    print(node.letter)
-    adjacent_coords = []
-    for node in all_nodes:
-        x = node.coords[0]
-        y = node.coords[1]
-        adjacent_coords += [
-            (x + 1, y),  
+    all_nodes = [node for row in board for node in row]
+    
+    all_start_and_end_nodes = list(product(all_nodes, repeat=2))
+    all_start_and_end_nodes_bar = Bar('Finding Start and end nodes', max=len(all_start_and_end_nodes)/16)
+    for i, node in enumerate(all_nodes):
+        all_start_and_end_nodes_bar.next()
+        x, y = node.coords
+        adjacent_coords = [
+            (x + 1, y),
             (x - 1, y),
             (x, y + 1),
             (x, y - 1),
@@ -189,42 +153,37 @@ def find_all_letter_combos(board):
             (x + 1, y - 1),
             (x - 1, y - 1)
         ]
-        
-    adjacent_nodes = []
-    
-    for coords in adjacent_coords:
-        for node in all_nodes:
-            if node.coords == coords:
-                adjacent_nodes.append(node) 
-                
-    # Debugging Purposes
-    edges_info = []
-    for node in all_nodes:
-        for adjacent_node in adjacent_nodes:
-            if abs(node.coords[0] - adjacent_node.coords[0]) <= 1 and abs(node.coords[1] - adjacent_node.coords[1]) <= 1: #Dont need the inverses as their absolute values are the same
-                #edges_info.append((node.letter, node.coords, adjacent_node.letter, adjacent_node.coords))
-                edges.append((node, adjacent_node)) # MAKE THIS THE ACTUAL NODES< THE LETTERS ARE FOR DEBUGGING
-                                                                # ALSO THE LETTERS CANT COPE WITH DUPED LETTERS
-        
+
+        adjacent_nodes = [n for n in all_nodes if n.coords in adjacent_coords]
+        edges.extend((node, adj_node) for adj_node in adjacent_nodes)
+    all_start_and_end_nodes_bar.finish()
     edge_list = list(edges)
     G = nx.Graph()
     G.add_edges_from(edge_list)
-    #nx.draw_spring(G, with_labels=True)
-    #plt.show()
-        
-    # 3. Use the command to get all paths from start to end coords
-    all_paths = []
-    
-    finding_paths_bar = Bar('Finding Paths', max=len(all_start_and_end_nodes))
-    for node_pair in all_start_and_end_nodes:
-        #print(node_pair)
 
-        all_paths += nx.all_simple_paths(G, node_pair[0], node_pair[1])
-        finding_paths_bar.next()
-    finding_paths_bar.finish()
-    # 4. Done?
+    all_adjacent_nodes = [list(G.neighbors(node)) for node in all_nodes]
     
+    for node in all_nodes:
+        for adjacent_node in adjacent_nodes:
+            if abs(node.coords[0] - adjacent_node.coords[0]) <= 1 and abs(node.coords[1] - adjacent_node.coords[1]) <= 1:
+                edges.append((node, adjacent_node))
+    
+    edge_list = list(edges)
+    G = nx.Graph()
+    G.add_edges_from(edge_list)
+    
+    # Use concurrent.futures for parallel execution
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        # Use submit to get a Future object for each node pair
+        futures = [executor.submit(find_paths_for_node_pair, node_pair, G) for node_pair in all_start_and_end_nodes]
+
+        # Wait for all futures to complete and get the results in order
+        all_paths = [future.result() for future in concurrent.futures.as_completed(futures)]
+
     return all_paths
+
+def find_paths_for_node_pair(node_pair, G):
+    return list(nx.all_simple_paths(G, node_pair[0], node_pair[1]))
     
     
 
@@ -233,63 +192,38 @@ def find_all_letter_combos(board):
 def find_words(all_letter_combos_paths):
     """This crashes with a real board so i should make it slightly more efficient """
     finding_potential_words_bar = Bar('Finding Potential Words', max=len(all_letter_combos_paths))
-    potential_words = []
-    for path in all_letter_combos_paths:
+    potential_words = set()
+    for path_collection in all_letter_combos_paths:
         finding_potential_words_bar.next()
-        new_word = ""
-        for node in path:
-            #print(node.letter)
-            new_word += node.letter
-            #print(new_word)
-        potential_words.append(new_word)
-    #print(potential_words)
+        for path in path_collection:
+            #print(path)
+            new_word = ''.join(node.letter for node in path)
+            potential_words.add(new_word)
     finding_potential_words_bar.finish()
+
     
-    with open("10000words.txt", "r") as words: 
-        """This should be predone!! and also remove all words less than 3 letters long"""
-        words_list = words.readlines()
-        cleaning_dict_bar = Bar('Cleaning Dictionary', max=len(words_list))
-        cleaned_words_list = []
-        for word in words_list:
-            cleaning_dict_bar.next()
-            cleaned_word = ""
-            cleaned_word += word[:-2]
-            cleaned_word = cleaned_word.upper()
-            cleaned_words_list.append(cleaned_word)
-        cleaning_dict_bar.finish()
+    with open("safedict_full.txt", "r") as words_1:
+        with open("safedict_complex.txt", "r") as words_2:
+            """This should be predone!! and also remove all words less than 3 letters long"""
+            words_list = set(words_1.readlines() + words_2.readlines())
+            cleaned_words_list = {word.strip().upper() for word in words_list if len(word) >= 3}
 
         letter_combos_longer_than_three = []
-        
-        finding_correct_words_bar_1 = Bar("Finding Words Check 1/2", max= len(potential_words))
-        for word in potential_words:
-            #print(word)
-            if len(word) >= 3:
-                letter_combos_longer_than_three.append(word)
-            finding_correct_words_bar_1.next()
-        finding_correct_words_bar_1.finish()
-        
+        print("Don't worry, it's not hanging its going great :)")
+        letter_combos_longer_than_three = potential_words.intersection(cleaned_words_list) #OMG this is so fast
+        print("Don't worry, it's not hanging its going great")
         
         
         finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(letter_combos_longer_than_three))
-        all_words_in_board = []
+
         paths_used = []
         final_words =[]
-        for potential_word in letter_combos_longer_than_three:
-            finding_correct_words_bar_2.next()
-            if str(potential_word) in cleaned_words_list:
-                final_words.append(potential_word)
-                #print(potential_word)
-                #Deal with double points tagging here if i can be bothered
+        
+        final_words = [word for word in letter_combos_longer_than_three if len(word) >= 3]
         finding_correct_words_bar_2.finish()     
         
-    
-                
         print(f"Final words:{final_words}")
-        return words, paths_used
-        
-
-def count_points(parsed_board, double_squares, words):
-    return NotImplementedError
+    
 
 if __name__ == "__main__":
     main()
