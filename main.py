@@ -127,6 +127,8 @@ def parse_board_into_oop(original_board, diamensions, double_coords):
         new_board.append([])
         for letter_index in range(len(original_board[row_index])):
             letter = original_board[row_index][letter_index]
+            if letter == "Q" or letter.upper() == "QU":
+                letter = "QU"
             coords = (row_index, letter_index)
             double = coords in double_coords
             new_board[row_index].append(Node(letter=letter, coords=coords, is_double=double))
@@ -138,7 +140,7 @@ def find_all_letter_combos(board):
     """Turns board into network & Finds all letter combos using concurrency magic"""
     edges = []
     all_nodes = [node for row in board for node in row]
-    all_start_and_end_nodes = list(product(all_nodes, repeat=2))
+    all_start_and_end_nodes = list(product(all_nodes, all_nodes))
     all_start_and_end_nodes_bar = Bar('Finding Start and end nodes', max=len(all_start_and_end_nodes)/16)
     for i, node in enumerate(all_nodes):
         all_start_and_end_nodes_bar.next()
@@ -196,12 +198,9 @@ def find_words(all_letter_combos_paths):
         for path in path_collection:
             new_word = ''.join(node.letter for node in path)
             potential_words.add(new_word)
-            if any(node.is_double for node in path):
-                num_doubles = 0
-                for node in path:
-                    if node.is_double:
-                        num_doubles += 1
-                words_with_double_points.update({new_word: num_doubles})
+            num_doubles = sum(node.is_double for node in path) # From here
+            if num_doubles > 0:
+                words_with_double_points[new_word] = num_doubles # To here was succinted by chatgpt
     finding_potential_words_bar.finish()
 
     
@@ -231,6 +230,7 @@ def find_words(all_letter_combos_paths):
     
 
 def count_points(words, double_words):
+    print(double_words)
     points = 0
     for word in words:
         this_word_points = 0
@@ -247,10 +247,10 @@ def count_points(words, double_words):
                 this_word_points += 5
             case _:  # 8 or higher as all below 3 have been filtered out
                 this_word_points += 11
-        if word in double_words:
+        if word in double_words.keys():
             this_word_points *= (2*double_words[word])
-        print(this_word_points)
-        # Figure out why it maxes out at 2 doubles
+        #print(this_word_points)
+        
         points += this_word_points
     return points
                 
