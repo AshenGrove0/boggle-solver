@@ -48,7 +48,7 @@ def main():
     points = count_points(words, double_words)
     print(f"Words: {words}")
     print(f"Double words: {double_words}")
-    print(f"Points (if no doubles): {points}")
+    print(f"Points: {points}")
     print(f"Time: {time.time() - start_time}")
 
 
@@ -109,7 +109,6 @@ def find_double_coords(parsed_board, diamensions):
                 character = parsed_board[row][character_index]
 
                 if character not in LETTERS_LIST:
-
                     if character == 2 or character == "2":
                         double_coords.add(tuple((row, character_index-1))) # Adds it to the list
                         parsed_board_no_doubles[row].remove(character) # Formats the parsed list to get rid of it
@@ -139,7 +138,6 @@ def find_all_letter_combos(board):
     """Turns board into network & Finds all letter combos using concurrency magic"""
     edges = []
     all_nodes = [node for row in board for node in row]
-    
     all_start_and_end_nodes = list(product(all_nodes, repeat=2))
     all_start_and_end_nodes_bar = Bar('Finding Start and end nodes', max=len(all_start_and_end_nodes)/16)
     for i, node in enumerate(all_nodes):
@@ -192,14 +190,18 @@ def find_words(all_letter_combos_paths):
     """This crashes with a real board so i should make it slightly more efficient """
     finding_potential_words_bar = Bar('Finding Potential Words', max=len(all_letter_combos_paths))
     potential_words = set()
-    words_with_double_points = set()
+    words_with_double_points = dict()
     for path_collection in all_letter_combos_paths:
         finding_potential_words_bar.next()
         for path in path_collection:
             new_word = ''.join(node.letter for node in path)
             potential_words.add(new_word)
             if any(node.is_double for node in path):
-                words_with_double_points.add(new_word)
+                num_doubles = 0
+                for node in path:
+                    if node.is_double:
+                        num_doubles += 1
+                words_with_double_points.update({new_word: num_doubles})
     finding_potential_words_bar.finish()
 
     
@@ -217,14 +219,13 @@ def find_words(all_letter_combos_paths):
         
         finding_correct_words_bar_2 = Bar("Finding Words Check 2/2", max=len(letter_combos_longer_than_three))
 
-        paths_used = []
         final_words =[]
         
         final_words = [word for word in letter_combos_longer_than_three if len(word) >= 3]
-        double_words = []
-        for word in words_with_double_points:
-            if word in final_words:
-                double_words.append(word)
+        double_words = dict()
+        for word in final_words:
+            if word in words_with_double_points.keys():
+                double_words.update({word: words_with_double_points[word]})
         finding_correct_words_bar_2.finish()     
         return final_words, double_words
     
@@ -247,9 +248,9 @@ def count_points(words, double_words):
             case _:  # 8 or higher as all below 3 have been filtered out
                 this_word_points += 11
         if word in double_words:
-            this_word_points *= (2*double_words.count(word))
+            this_word_points *= (2*double_words[word])
         print(this_word_points)
-        # There is some issue with doubles being deleted if they are duplicated
+        # Figure out why it maxes out at 2 doubles
         points += this_word_points
     return points
                 
