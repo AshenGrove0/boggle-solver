@@ -47,6 +47,7 @@ def main():
     words, double_words = find_words(all_letter_combos_paths)
     points = count_points(words, double_words)
     print(f"Words: {words}")
+    print(f"Double words: {double_words}")
     print(f"Points (if no doubles): {points}")
     print(f"Time: {time.time() - start_time}")
 
@@ -92,7 +93,7 @@ def get_diamensions(parsed_board):
 
 def find_double_coords(parsed_board, diamensions):
     """Gets the coordinates of double points locations and returns them as a list of tuples"""
-    
+
     double_coords = set()
     rows = diamensions[0]
     letters_per_row = diamensions[1]
@@ -110,7 +111,7 @@ def find_double_coords(parsed_board, diamensions):
                 if character not in LETTERS_LIST:
 
                     if character == 2 or character == "2":
-                        double_coords.add(tuple((row, character_index))) # Adds it to the list
+                        double_coords.add(tuple((row, character_index-1))) # Adds it to the list
                         parsed_board_no_doubles[row].remove(character) # Formats the parsed list to get rid of it
                     else:
                         print("Your board is not possible. Please only use letters and the number 2. Check for spaces.")
@@ -135,7 +136,7 @@ def parse_board_into_oop(original_board, diamensions, double_coords):
 
 
 def find_all_letter_combos(board):
-    """Turns board into network & Finds all letter combos"""
+    """Turns board into network & Finds all letter combos using concurrency magic"""
     edges = []
     all_nodes = [node for row in board for node in row]
     
@@ -175,10 +176,7 @@ def find_all_letter_combos(board):
     
     # Use concurrent.futures for parallel execution
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        # Use submit to get a Future object for each node pair
         futures = [executor.submit(find_paths_for_node_pair, node_pair, G) for node_pair in all_start_and_end_nodes]
-
-        # Wait for all futures to complete and get the results in order
         all_paths = [future.result() for future in concurrent.futures.as_completed(futures)]
 
     return all_paths
@@ -194,12 +192,14 @@ def find_words(all_letter_combos_paths):
     """This crashes with a real board so i should make it slightly more efficient """
     finding_potential_words_bar = Bar('Finding Potential Words', max=len(all_letter_combos_paths))
     potential_words = set()
+    words_with_double_points = set()
     for path_collection in all_letter_combos_paths:
         finding_potential_words_bar.next()
         for path in path_collection:
-            #print(path)
             new_word = ''.join(node.letter for node in path)
             potential_words.add(new_word)
+            if any(node.is_double for node in path):
+                words_with_double_points.add(new_word)
     finding_potential_words_bar.finish()
 
     
@@ -221,28 +221,36 @@ def find_words(all_letter_combos_paths):
         final_words =[]
         
         final_words = [word for word in letter_combos_longer_than_three if len(word) >= 3]
-        finding_correct_words_bar_2.finish()     
         double_words = []
+        for word in words_with_double_points:
+            if word in final_words:
+                double_words.append(word)
+        finding_correct_words_bar_2.finish()     
         return final_words, double_words
     
 
 def count_points(words, double_words):
     points = 0
-    print(words)
     for word in words:
+        this_word_points = 0
         match len(word):
             case 3:
-                points += 1
+                this_word_points += 1
             case 4:
-                points += 1
+                this_word_points += 1
             case 5:
-                points += 2
+                this_word_points += 2
             case 6:
-                points += 3
+                this_word_points += 3
             case 7:
-                points += 5
-            case _:  # >=8
-                points += 11
+                this_word_points += 5
+            case _:  # 8 or higher as all below 3 have been filtered out
+                this_word_points += 11
+        if word in double_words:
+            this_word_points *= (2*double_words.count(word))
+        print(this_word_points)
+        # There is some issue with doubles being deleted if they are duplicated
+        points += this_word_points
     return points
                 
             
