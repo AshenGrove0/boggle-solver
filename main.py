@@ -47,8 +47,8 @@ def main():
     words, double_words = find_words(all_letter_combos_paths)
     points = count_points(words, double_words)
     print(f"Words: {words}")
-    print(f"Double words: {double_words}")
-    print(f"Points: {points}")
+    #print(f"Double words: {double_words}")
+    #print(f"Points: {points}")
     print(f"Time: {time.time() - start_time}")
 
 
@@ -198,9 +198,9 @@ def find_words(all_letter_combos_paths):
         for path in path_collection:
             new_word = ''.join(node.letter for node in path)
             potential_words.add(new_word)
-            num_doubles = sum(node.is_double for node in path) # From here
-            if num_doubles > 0:
-                words_with_double_points[new_word] = num_doubles # To here was succinted by chatgpt
+            num_doubles = sum(node.is_double for node in path)
+            if new_word not in words_with_double_points or num_doubles > words_with_double_points[new_word]:
+                words_with_double_points[new_word] = num_doubles
     finding_potential_words_bar.finish()
 
     
@@ -221,10 +221,7 @@ def find_words(all_letter_combos_paths):
         final_words =[]
         
         final_words = [word for word in letter_combos_longer_than_three if len(word) >= 3]
-        double_words = dict()
-        for word in final_words:
-            if word in words_with_double_points.keys():
-                double_words.update({word: words_with_double_points[word]})
+        double_words = {word: words_with_double_points.get(word, 0) for word in final_words}
         finding_correct_words_bar_2.finish()     
         return final_words, double_words
     
